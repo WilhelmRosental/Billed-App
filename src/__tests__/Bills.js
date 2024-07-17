@@ -141,7 +141,7 @@ describe("Given I am connected as an employee", () => {
 
       const result = await bill.getBills();
 
-      expect(result[0].date).toEqual("4 Avr. 04");
+      expect(result[0].date).toEqual("2004-04-04");
     });
 
     describe("When an error occurs on API", () => {
