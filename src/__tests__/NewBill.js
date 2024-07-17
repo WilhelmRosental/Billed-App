@@ -2,10 +2,6 @@
  * @jest-environment jsdom
  */
 
-// import { screen } from "@testing-library/dom";
-// import NewBillUI from "../views/NewBillUI.js";
-// import NewBill from "../containers/NewBill.js";
-
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
