@@ -14,12 +14,13 @@ import { bills } from "../fixtures/bills.js";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
+    // Test pour vérifier le clic sur le champ de sélection de fichier
     test("Then I click on choose file", () => {
-      // On simule le localStorage en utilisant localStorageMock
+      // Simule le localStorage en utilisant localStorageMock
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
-      // On simule la connexion d'un compte type employé
+      // Simule la connexion d'un compte de type employé
       window.localStorage.setItem(
         "user",
         JSON.stringify({
@@ -27,23 +28,26 @@ describe("Given I am connected as an employee", () => {
         })
       );
 
-      // Remplace le corps du document HTML
+      // Remplace le contenu du document HTML avec l'interface NewBill
       document.body.innerHTML = NewBillUI();
 
-      // On obtient le premier icone à partir du DOM
+      // Récupère le champ de fichier à partir du DOM
       const file = screen.getByTestId("file");
 
-      // On crée une fonction espionne
+      // Crée une fonction espionne pour le changement de fichier
       const handleChangeFile = jest.fn();
 
+      // Ajoute un écouteur d'événement pour le clic et simule le clic
       file.addEventListener("click", handleChangeFile);
       userEvent.click(file);
 
+      // Vérifie que la fonction handleChangeFile a été appelée
       expect(handleChangeFile).toHaveBeenCalled();
     });
 
+    // Test pour vérifier le téléchargement d'un fichier valide
     test("Then I upload the bill it's valid", () => {
-      // A COMMENTER
+      // Simule le localStorage en utilisant localStorageMock
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -53,8 +57,10 @@ describe("Given I am connected as an employee", () => {
           type: "Employee",
         })
       );
+      // Remplace le contenu du document HTML avec l'interface NewBill
       document.body.innerHTML = NewBillUI();
 
+      // Crée une instance de NewBill avec les paramètres nécessaires
       const newBill = new NewBill({
         document,
         onNavigate: null,
@@ -62,26 +68,34 @@ describe("Given I am connected as an employee", () => {
         bills,
         localStorage: window.localStorage,
       });
+
+      // Récupère le champ de fichier à partir du DOM
       const file = screen.getByTestId("file");
 
+      // Crée un faux fichier PNG
       const fileFake = new File([""], "fake-file.png", { type: "image/png" });
 
+      // Simule le téléchargement du fichier
       userEvent.upload(file, fileFake);
 
+      // Vérifie que le fichier a bien été téléchargé
       expect(file.files.length).toBe(1);
 
+      // Crée une fonction espionne pour le changement de fichier
       const handleChangeFile = jest.fn(() => newBill.handleChangeFile);
 
+      // Ajoute un écouteur d'événement pour le clic et simule le clic
       file.addEventListener("click", handleChangeFile);
       userEvent.click(file);
 
+      // Vérifie que la fonction handleChangeFile a été appelée et que le type de fichier est correct
       expect(handleChangeFile).toHaveBeenCalled();
-
       expect(file.files[0].type).toBe("image/png");
     });
 
+    // Test pour vérifier le téléchargement d'un fichier invalide
     test("Then I upload the bill it's invalid", () => {
-      // A COMMENTER
+      // Simule le localStorage en utilisant localStorageMock
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -91,12 +105,14 @@ describe("Given I am connected as an employee", () => {
           type: "Employee",
         })
       );
+      // Remplace le contenu du document HTML avec l'interface NewBill
       document.body.innerHTML = NewBillUI();
 
-      // Remplace les alerte par une fonction vide
+      // Remplace les alertes par une fonction vide
       const jsdomAlert = window.alert;
       window.alert = () => {};
 
+      // Crée une instance de NewBill avec les paramètres nécessaires
       const newBill = new NewBill({
         document,
         onNavigate: null,
@@ -104,28 +120,37 @@ describe("Given I am connected as an employee", () => {
         bills,
         localStorage: window.localStorage,
       });
+
+      // Récupère le champ de fichier à partir du DOM
       const file = screen.getByTestId("file");
 
-      // Créer un fichier factice
+      // Crée un faux fichier texte
       const fileFake = new File([""], "fake-file.txt", { type: "text/plain" });
 
+      // Simule le téléchargement du fichier
       userEvent.upload(file, fileFake);
 
+      // Vérifie que le fichier a bien été téléchargé
       expect(file.files.length).toBe(1);
 
+      // Crée une fonction espionne pour le changement de fichier
       const handleChangeFile = jest.fn(() => newBill.handleChangeFile);
 
+      // Ajoute un écouteur d'événement pour le clic et simule le clic
       file.addEventListener("click", handleChangeFile);
       userEvent.click(file);
 
+      // Vérifie que la fonction handleChangeFile a été appelée et que la validité du fichier est incorrecte
       expect(handleChangeFile).toHaveBeenCalled();
-
       expect(file.reportValidity()).not.toBeTruthy();
 
-      window.alert = jsdomAlert; // restore les alert
+      // Restaure les alertes d'origine
+      window.alert = jsdomAlert;
     });
 
+    // Test pour vérifier la soumission du formulaire
     test("Then I submit for send", () => {
+      // Simule le localStorage en utilisant localStorageMock
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -136,12 +161,15 @@ describe("Given I am connected as an employee", () => {
           email: "example@test.com",
         })
       );
+      // Remplace le contenu du document HTML avec l'interface NewBill
       document.body.innerHTML = NewBillUI();
 
+      // Fonction de navigation simulée
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
 
+      // Crée une instance de NewBill avec les paramètres nécessaires
       const newBill = new NewBill({
         document,
         onNavigate,
@@ -150,22 +178,28 @@ describe("Given I am connected as an employee", () => {
         localStorage: window.localStorage,
       });
 
+      // Récupère le bouton de soumission du formulaire à partir du DOM
       const buttonSubmit = screen.getByTestId("form-new-bill");
 
+      // Crée une fonction espionne pour la soumission du formulaire
       const handleSubmit = jest.fn((event) => newBill.handleSubmit(event));
 
+      // Ajoute un écouteur d'événement pour la soumission et simule la soumission
       buttonSubmit.addEventListener("submit", handleSubmit);
-
       fireEvent.submit(buttonSubmit);
 
+      // Vérifie que la fonction handleSubmit a été appelée
       expect(handleSubmit).toHaveBeenCalled();
     });
   });
 
-  //POST Integration
+  // Test d'intégration pour le POST de nouvelle facture
   describe("When I post new bill", () => {
     test("Then bill from mock API POST", async () => {
+      // Espionne la méthode bills du mockStore
       jest.spyOn(mockStore, "bills");
+
+      // Crée une nouvelle facture
       const bill = {
         id: "47qAXb6fIm2zOKkLzMro",
         vat: "80",
@@ -182,16 +216,21 @@ describe("Given I am connected as an employee", () => {
         email: "a@a",
         pct: 20,
       };
+
+      // Simule la mise à jour de la facture via l'API mock
       const postBill = await mockStore.bills().update(bill);
 
+      // Vérifie que la facture postée correspond à celle créée
       expect(postBill).toStrictEqual(bill);
     });
   });
 
   describe("When an error occurs on API", () => {
     beforeEach(() => {
+      // Remplace le contenu du document HTML avec l'interface NewBill
       document.body.innerHTML = NewBillUI();
 
+      // Simule le localStorage avec un utilisateur de type employé
       window.localStorage.setItem(
         "user",
         JSON.stringify({
@@ -200,21 +239,24 @@ describe("Given I am connected as an employee", () => {
       );
     });
 
+    // Test pour vérifier le comportement en cas d'erreur 404 lors du POST
     test("Then post new bill fails with error 404", async () => {
+      // Fonction de navigation simulée
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
 
-      // -> Espionne la fonction si elle est appelé dans la console
+      // Espionne la méthode console.error
       const spyOn = jest.spyOn(console, "error");
 
-      // -> Mock d'objets pour créer erreur
+      // Crée un store simulé avec une méthode update rejetant une erreur 404
       const store = {
         bills: jest.fn(() => newBill.store),
         create: jest.fn(() => Promise.resolve({})),
         update: jest.fn(() => Promise.reject(new Error("Erreur 404"))),
       };
 
+      // Crée une instance de NewBill avec les paramètres nécessaires
       const newBill = new NewBill({
         document,
         onNavigate,
@@ -222,27 +264,39 @@ describe("Given I am connected as an employee", () => {
         localStorage,
       });
 
+      // Récupère le formulaire de nouvelle facture à partir du DOM
       const formNewBill = screen.getByTestId("form-new-bill");
+
+      // Crée une fonction espionne pour la soumission du formulaire
       const handleSubmit = jest.fn(() => newBill.handleSubmit);
       formNewBill.addEventListener("submit", handleSubmit);
 
+      // Simule la soumission du formulaire et attend le traitement asynchrone
       fireEvent.submit(formNewBill);
       await new Promise(process.nextTick);
 
+      // Vérifie que l'erreur 404 a été loguée dans la console
       expect(spyOn).toBeCalledWith(new Error("Erreur 404"));
     });
+
+    // Test pour vérifier le comportement en cas d'erreur 505 lors du POST
     test("Then post new bill fails with error 505", async () => {
+      // Fonction de navigation simulée
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
-      // Espionne la fonction si elle est appelé dans la console
+
+      // Espionne la méthode console.error
       const spyOn = jest.spyOn(console, "error");
-      // Mock d'objets pour créer erreur
+
+      // Crée un store simulé avec une méthode update rejetant une erreur 505
       const store = {
         bills: jest.fn(() => newBill.store),
         create: jest.fn(() => Promise.resolve({})),
         update: jest.fn(() => Promise.reject(new Error("Erreur 505"))),
       };
+
+      // Crée une instance de NewBill avec les paramètres nécessaires
       const newBill = new NewBill({
         document,
         onNavigate,
@@ -250,12 +304,18 @@ describe("Given I am connected as an employee", () => {
         localStorage,
       });
 
+      // Récupère le formulaire de nouvelle facture à partir du DOM
       const formNewBill = screen.getByTestId("form-new-bill");
+
+      // Crée une fonction espionne pour la soumission du formulaire
       const handleSubmit = jest.fn(() => newBill.handleSubmit);
       formNewBill.addEventListener("submit", handleSubmit);
 
+      // Simule la soumission du formulaire et attend le traitement asynchrone
       fireEvent.submit(formNewBill);
       await new Promise(process.nextTick);
+
+      // Vérifie que l'erreur 505 a été loguée dans la console
       expect(spyOn).toBeCalledWith(new Error("Erreur 505"));
     });
   });
